@@ -1,10 +1,10 @@
 # ECG plot
 
-![example 12 lead plot](https://github.com/dy1901/ecg_plot/raw/master/example_ecg.png)
+![example 12 lead plot](https://github.com/chenhaodev/biosig_ecg_plot/blob/master/example_ecg.png)
 
 ## Plot standard ECG chart from data.
 * Support both direct plotting and plotting SVG preview in browser (currently only works on mac)
-* Support saving PNG and SVG to disk
+* Support saving PNG and SVG to disk. e.g. `ecg_plot.plot(ecg, title='12L ekg'); ecg_plot.save_as_svg('example_ecg')`
 * Support customer defined lead order
 * Support customer defined column count
 
