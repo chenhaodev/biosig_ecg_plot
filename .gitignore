@@ -4,3 +4,12 @@ __pycache__/
 *.egg-info
 dist
 *.png
+bin/*
+include/*
+lib/*
+share/*
+*.dat
+*.hea
+*.atr
+.ipynb_checkpoints/
+*.alert.txt
