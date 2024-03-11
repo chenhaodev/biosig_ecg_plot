@@ -13,3 +13,4 @@ share/*
 *.atr
 .ipynb_checkpoints/
 *.alert.txt
+.DS_Store
