@@ -20,6 +20,7 @@ for nni_file in nni_files:
 
     # Open a file for writing the output
     output_file = nni_file.replace('.nni.txt', '.nna.txt')
+    print(f"Analysis results for {nni_file} saved to: {output_file}")
     with open(output_file, 'w') as f:
         # Check if there are enough samples after removing anomalies
         min_samples = 3  # Minimum number of samples required for GMM (e.g. 1 min arrhy)
@@ -67,7 +68,7 @@ for nni_file in nni_files:
 
                 # Calculate and print kurtosis, 1-SD, and 2-SD for each valid distribution
                 for i in range(best_n_components):
-                    if valid_distributions[i]:
+                    if i < len(valid_distributions) and valid_distributions[i]:
                         distribution_data = nni_data[labels == i]
                         distribution_kurtosis = kurtosis(distribution_data, fisher=False)[0]
                         distribution_mean = np.mean(distribution_data)
@@ -79,4 +80,3 @@ for nni_file in nni_files:
                         f.write(f"  1-SD Range: [{distribution_mean - distribution_std:.2f}, {distribution_mean + distribution_std:.2f}] ms\n")
                         f.write(f"  2-SD Range: [{distribution_mean - 2*distribution_std:.2f}, {distribution_mean + 2*distribution_std:.2f}] ms\n")
 
-    print(f"Analysis results for {nni_file} saved to: {output_file}")
