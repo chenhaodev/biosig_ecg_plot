@@ -8,11 +8,6 @@
 * Support customer defined lead order
 * Support customer defined column count
 
-## Install
-```
-pip install ecg_plot
-```
-
 ## Notice
 * Input data should be m x n matrix, which m is lead count of ECG and n is length of single lead signal.
 * Default sample rate is 500 Hz.
@@ -40,18 +35,17 @@ params:
 |show_separate_line  | show separate line |
 
 
-```
+```python
 import ecg_plot
 
 ecg = load_data() # load data should be implemented by yourself 
 ecg_plot.plot(ecg, sample_rate = 500, title = 'ECG 12')
 ecg_plot.show()
-
 ```
 
 #### Plot single lead ECG
 
-```
+```python
 import ecg_plot
 
 ecg = load_data() # load data should be implemented by yourself 
@@ -61,17 +55,36 @@ ecg_plot.show()
 
 #### Save result as png
 
-```
+```python
 import ecg_plot
 
 ecg = load_data() # load data should be implemented by yourself 
 ecg_plot.plot_12(ecg, sample_rate = 500, title = 'ECG 12')
 ecg_plot.save_as_png('example_ecg','tmp/')
-
 ```
 
-#### Plot 30 sec ECG from wfdb format
-```
+#### Plot 30 second ECG from wfdb format
+```bash
 git clone https://github.com/chenhaodev/sig-ecgplot-db ; cp sig-ecgplot-db/example-db/noisy_ekg_hrv_ge/* . ; cat Case106.part1.dat Case106.part2.dat Case106.part3.dat > Case106.dat ; 
 python ecg_plot1_ekg_30sec_cli.py Case106 0 30
+```
+
+#### One step script: de-noise, calculate nni, check potential arrhy, plot segments
+```bash
+#prepare dataset
+cd examples/noisy_ekg_hrv_ge/ ; 
+git clone https://github.com/chenhaodev/sig-ecgplot-db ; cp sig-ecgplot-db/example-db/noisy_ekg_hrv_ge/* . ; 
+cat Case106.part1.dat Case106.part2.dat Case106.part3.dat > Case106.dat ; 
+
+#ekg analysis
+python step1_noise_spike_detect.py #detect noise    
+python step2_nn_intervals_gen.py #generate nn interval while skipping noise period. 
+python step3_nn_hist_analysis.py #analysis nn interval using GMM. 
+python step4_potential_arrhy.py #identify potential arrhy segment; please save the printed segment (on, off) into Case106.segment.list manually (TODO)
+
+#ekg plot (potential arrhy segment)
+cd - 
+mv sig-ecgplot-db/example-db/noisy_ekg_hrv_ge/nni-results/img/Case106.plot.py . 
+mv sig-ecgplot-db/example-db/noisy_ekg_hrv_ge/Case106.dat . 
+python Case106.plot.py # it check all (on, off) in Case106.segment.list, iteratively call function eca_plot1_eka_30sec_cli.py to plot png. 
 ```
