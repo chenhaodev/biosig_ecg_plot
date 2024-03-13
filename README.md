@@ -70,4 +70,8 @@ ecg_plot.save_as_png('example_ecg','tmp/')
 
 ```
 
-### License: MIT
+#### Plot 30 sec ECG from wfdb format
+```
+git clone https://github.com/chenhaodev/sig-ecgplot-db ; cp sig-ecgplot-db/example-db/noisy_ekg_hrv_ge/* . ; cat Case106.part1.dat Case106.part2.dat Case106.part3.dat > Case106.dat ; 
+python ecg_plot1_ekg_30sec_cli.py Case106 0 30
+```
