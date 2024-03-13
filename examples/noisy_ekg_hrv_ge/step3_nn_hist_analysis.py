@@ -21,7 +21,7 @@ for nni_file in nni_files:
     # Open a file for writing the output
     output_file = nni_file.replace('.nni.txt', '.nna.txt')
     print(f"Analysis results for {nni_file} saved to: {output_file}")
-    with open(output_file, 'w') as f:
+    with open(output_file, 'w', encoding='utf-8') as f:
         # Check if there are enough samples after removing anomalies
         min_samples = 3  # Minimum number of samples required for GMM (e.g. 1 min arrhy)
         if len(nni_data) < min_samples:
@@ -62,7 +62,7 @@ for nni_file in nni_files:
                 f.write(f"Number of valid distributions: {num_valid_distributions}\n")
 
                 if num_valid_distributions == 1:
-                    f.write("The NNI data likely follows a single distribution.\n")
+                    f.write("The NNI data likely follows 1 distribution.\n")
                 else:
                     f.write(f"The NNI data likely follows {num_valid_distributions} distributions.\n")
 
