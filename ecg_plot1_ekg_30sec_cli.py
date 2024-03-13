@@ -23,8 +23,8 @@ def plot_ekg(record_name, start_sec, end_sec):
     idx_start = max(idx_start, 0)
     idx_end = min(idx_end, num_samples - 1)
 
-    # Assuming the EKG signal is the first channel
-    ekg_signal = signals[idx_start:idx_end, 0]
+    # Assuming the EKG signal is the first/2nd channel
+    ekg_signal = signals[idx_start:idx_end, 1]
     plot_timestamps = timestamps[idx_start:idx_end]
     return ekg_signal, plot_timestamps
 
