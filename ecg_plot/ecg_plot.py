@@ -6,7 +6,6 @@ from matplotlib.ticker import AutoMinorLocator
 import os
 from math import ceil 
 
-
 def _ax_plot(ax, x, y, secs=10, lwidth=0.5, amplitude_ecg = 1.8, time_ticks =0.2):
     ax.set_xticks(np.arange(0,11,time_ticks))    
     ax.set_yticks(np.arange(-ceil(amplitude_ecg),ceil(amplitude_ecg),1.0))
@@ -239,7 +238,7 @@ def show():
     plt.show()
 
 
-def save_as_png(file_name, path = DEFAULT_PATH, dpi = 100, layout='tight'):
+def save_as_png(file_name, path = DEFAULT_PATH, dpi = 300, layout='tight'):
     """Plot multi lead ECG chart.
     # Arguments
         file_name: file_name
@@ -270,3 +269,48 @@ def save_as_jpg(file_name, path = DEFAULT_PATH):
     plt.ioff()
     plt.savefig(path + file_name + '.jpg')
     plt.close()
+
+
+
+def plot_single_channel_ekg_30sec(ecg, sample_rate=240, title='ECG Single Lead', secs=30, lwidth=0.5, amplitude_ecg=1.8, time_ticks=1.0, file_path=None):
+    # Calculate the number of samples to plot based on the sample rate and desired time duration (secs)
+    num_samples = int(secs * sample_rate)
+
+    # Ensure the ECG data length matches the desired plot duration, truncate or pad if necessary
+    ecg = ecg[:num_samples] if len(ecg) > num_samples else np.pad(ecg, (0, max(0, num_samples - len(ecg))), 'constant')
+
+    # Create time vector based on the number of samples and sample rate
+    x = np.linspace(0, secs, num_samples)
+
+    # Setup plot
+    fig, ax = plt.subplots(figsize=(20, 4))
+    _ax_plot_30(ax, x, ecg, secs=secs, lwidth=lwidth, amplitude_ecg=amplitude_ecg, time_ticks=time_ticks)
+    #plt.title(title)
+    #plt.show()
+    
+    # # Save or show the plot based on whether a file_path is provided
+    # if file_path:
+    #     save_as_png(fig, file_path)
+    # else:
+    #     plt.show()
+
+
+def _ax_plot_30(ax, x, y, secs=30, lwidth=0.5, amplitude_ecg = 1.8, time_ticks =0.2):
+    ax.set_xticks(np.arange(0,31,time_ticks))    
+    ax.set_yticks(np.arange(-ceil(amplitude_ecg),ceil(amplitude_ecg),1.0))
+
+    #ax.set_yticklabels([])
+    #ax.set_xticklabels([])
+
+    ax.minorticks_on()
+    
+    ax.xaxis.set_minor_locator(AutoMinorLocator(5))
+
+    ax.set_ylim(-amplitude_ecg, amplitude_ecg)
+    ax.set_xlim(0, secs)
+
+    ax.grid(which='major', linestyle='-', linewidth='0.5', color='red')
+    ax.grid(which='minor', linestyle='-', linewidth='0.5', color=(1, 0.7, 0.7))
+
+    ax.plot(x,y, linewidth=lwidth)
+
