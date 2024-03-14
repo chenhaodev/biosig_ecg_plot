@@ -83,8 +83,8 @@ python step3_nn_hist_analysis.py #analysis nn interval using GMM.
 python step4_potential_arrhy.py > Case106.segment.list #identify potential arrhy segment.
 
 #ekg plot (potential arrhy segment)
+cp step5_segment_plot.py ../../
+cp Case106.dat ../../
 cd - 
-mv examples/noisy_ekg_hrv_ge/sig-ecgplot-db/example-db/noisy_ekg_hrv_ge/nni-results/img/Case106.plot.py . 
-mv examples/noisy_ekg_hrv_ge/sig-ecgplot-db/example-db/noisy_ekg_hrv_ge/Case106.dat . 
-python Case106.plot.py # it check all (on, off) in Case106.segment.list, iteratively call function eca_plot1_eka_30sec_cli.py to plot png. 
+python step5_segment_plot.py # it check all (on, off) in Case106.segment.list, and iteratively call function eca_plot1_eka_30sec_cli.py to plot png. 
 ```
