@@ -17,9 +17,9 @@ def detect_ekg_spikes(signal, fs=240, median_signal=5, threshold=50, window_size
     
     return spike_mask
 
-def generate_spike_alerts(spike_mask, fs, alert_window=10*60): 
+def generate_spike_alerts(spike_mask, fs, alert_window=5*60): 
     """
-    Generate alerts every 'alert_window' seconds if any spike is detected. (default: every 10 min)
+    Generate alerts every 'alert_window' seconds if any spike is detected. (default: every 5 min)
     """
     alert_window_samples = alert_window * fs
     num_windows = len(spike_mask) // alert_window_samples
@@ -64,7 +64,7 @@ def process_ekg_files(data_dir):
             
             # Detect spike noise and generate alerts every 10 min
             spike_mask = detect_ekg_spikes(signal=signals[:, 0], fs=240, median_signal=5, threshold=50, window_size=60)
-            alerts = generate_spike_alerts(spike_mask, fs=240, alert_window=10*60)
+            alerts = generate_spike_alerts(spike_mask, fs=240, alert_window=5*60)
 
             # Write alerts to a log file
             log_filename = f"{record_name}.alert.txt"

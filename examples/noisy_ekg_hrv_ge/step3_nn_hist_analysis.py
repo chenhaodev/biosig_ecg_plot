@@ -52,12 +52,12 @@ for nni_file in nni_files:
             labels = best_gmm.predict(nni_data)
             sample_counts = np.bincount(labels)
 
-            # Ignore distributions with fewer than 60 samples
-            valid_distributions = sample_counts >= 60
+            # Ignore distributions with fewer than 30 samples
+            valid_distributions = sample_counts >= 30
             num_valid_distributions = np.sum(valid_distributions)
 
             if num_valid_distributions == 0:
-                f.write("No valid distributions found (all distributions have fewer than 60 samples).\n")
+                f.write("No valid distributions found (all distributions have fewer than 30 samples).\n")
             else:
                 f.write(f"Number of valid distributions: {num_valid_distributions}\n")
 

@@ -101,7 +101,7 @@ def process_ekg_files(data_dir, segment_length):
 data_dir = './'
 
 # Specify the desired segment length (in samples)
-segment_length = 10 * 60 * 250  # 10 minutes at 250 Hz sampling rate
+segment_length = 5 * 60 * 250  # 5 minutes at 250 Hz sampling rate
 
 # Process ECG/EKG files, mask noise periods, and calculate NN intervals
 process_ekg_files(data_dir, segment_length)
