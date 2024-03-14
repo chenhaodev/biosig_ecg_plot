@@ -74,17 +74,17 @@ python ecg_plot1_ekg_30sec_cli.py Case106 0 30
 #prepare dataset
 cd examples/noisy_ekg_hrv_ge/ ; 
 git clone https://github.com/chenhaodev/sig-ecgplot-db ; cp sig-ecgplot-db/example-db/noisy_ekg_hrv_ge/* . ; 
-cat Case106.part1.dat Case106.part2.dat Case106.part3.dat > Case106.dat ; 
+cat Case106.part1.dat Case106.part2.dat Case106.part3.dat > Case106.dat ; rm Case106.part* ; 
 
 #ekg analysis
 python step1_noise_spike_detect.py #detect noise    
 python step2_nn_intervals_gen.py #generate nn interval while skipping noise period. 
 python step3_nn_hist_analysis.py #analysis nn interval using GMM. 
-python step4_potential_arrhy.py #identify potential arrhy segment; please save the printed segment (on, off) into Case106.segment.list manually (TODO)
+python step4_potential_arrhy.py > Case106.segment.list #identify potential arrhy segment.
 
 #ekg plot (potential arrhy segment)
 cd - 
-mv sig-ecgplot-db/example-db/noisy_ekg_hrv_ge/nni-results/img/Case106.plot.py . 
-mv sig-ecgplot-db/example-db/noisy_ekg_hrv_ge/Case106.dat . 
+mv examples/noisy_ekg_hrv_ge/sig-ecgplot-db/example-db/noisy_ekg_hrv_ge/nni-results/img/Case106.plot.py . 
+mv examples/noisy_ekg_hrv_ge/sig-ecgplot-db/example-db/noisy_ekg_hrv_ge/Case106.dat . 
 python Case106.plot.py # it check all (on, off) in Case106.segment.list, iteratively call function eca_plot1_eka_30sec_cli.py to plot png. 
 ```

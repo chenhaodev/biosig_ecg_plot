@@ -2,7 +2,11 @@ import os
 import re
 
 def is_abnormal(filename):
+
     """Check if the file content meets the abnormal criteria."""
+    if not filename.endswith('.nna.txt'):
+        return None 
+
     with open(filename, 'r') as file:
         content = file.read()
 
@@ -32,7 +36,28 @@ def list_abnormal_filenames():
 
     return abnormal_filenames
 
+def parse_filename(filename):
+    """
+    Parses the filename in the format 'CaseXXX.YYYY.ZZ-YYYY.ZZ.nna.txt'
+    and returns a dictionary with the record, onset, and offset extracted.
+
+    Args:
+    - filename (str): The filename to parse.
+
+    Returns:
+    - dict: A dictionary containing the record, onset, and offset.
+    """
+    # Regular expression to match the pattern in the filename
+    pattern = r'^(Case\d+)\.(\d+)\.\d{2}-(\d+)\.\d{2}\.nna\.txt$'
+    match = re.match(pattern, filename)
+    if match:
+        record, onset, offset = match.groups()
+        return record+","+str(int(onset))+","+str(int(offset))
+    else:
+        # If the filename does not match the expected pattern
+        return None
+
 # Execute the function and print out the abnormal filenames
 abnormal_filenames = list_abnormal_filenames()
 for filename in abnormal_filenames:
-    print(filename)
+    print(parse_filename(filename))
