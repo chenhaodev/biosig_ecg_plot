@@ -7,7 +7,7 @@ def chunk_segments(filename, onset, offset, chunk_size=30):
     for start in range(onset, offset, chunk_size):
         yield filename, start, min(start + chunk_size, offset)
 
-def main(segment_list_file):
+def main(segment_list_file, ekg_channel_id):
     # Open and read the segment list file
     with open(segment_list_file, 'r') as file:
         segments = file.readlines()
@@ -19,11 +19,12 @@ def main(segment_list_file):
 
         # Break down the segment into 30-second chunks and execute the CLI command for each
         for file, chunk_onset, chunk_offset in chunk_segments(filename, onset, offset):
-            cmd = f"python ecg_plot1_ekg_30sec_cli.py {file} {chunk_onset} {chunk_offset}"
+            cmd = f"python ecg_plot1_ekg_30sec_cli.py {file} {ekg_channel_id} {chunk_onset} {chunk_offset}"
             os.system(cmd)  # Execute the CLI command
             print(f"Executed: {cmd}")
 
 if __name__ == "__main__":
     #segment_list_file = "Case106.segment.list"
     segment_list_file = sys.argv[1] #"Case106.segment.list"
-    main(segment_list_file)
+    ekg_channel_id = sys.argv[2] #"0"
+    main(segment_list_file, ekg_channel_id)

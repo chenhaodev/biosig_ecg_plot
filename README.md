@@ -73,16 +73,17 @@ python ecg_plot1_ekg_30sec_cli.py Case106 0 30
 ```bash
 #prepare dataset
 cd examples/noisy_ekg_hrv_ge/ ; 
-git clone https://github.com/chenhaodev/sig-ecgplot-db ; cp sig-ecgplot-db/example-db/noisy_ekg_hrv_ge/* . ; 
-cat Case106.part1.dat Case106.part2.dat Case106.part3.dat > Case106.dat ; rm Case106.part* ; 
+git clone https://github.com/chenhaodev/sig-ecgplot-db ; cp sig-ecgplot-db/example-db/noisy_ekg_hrv_ge/Case127/* . ;
+cat Case127.part1.dat Case127.part2.dat > Case127.dat ; rm Case127.part* ;
 
 #ekg analysis
 python step1_noise_spike_detect.py #detect noise    
 python step2_nn_intervals_gen.py #generate nn interval while skipping noise period. 
 python step3_nn_hist_analysis.py #analysis nn interval using GMM. 
-python step4_potential_arrhy.py > Case106.segment.list #identify potential arrhy segment.
+python step4_potential_arrhy.py > Case127.segment.list #identify potential arrhy segment.
+sh clean.sh
 
 #ekg plot (potential arrhy segment)
-cp step5_segment_plot.py ../../ ; cp Case106.dat ../../ ; cp Case106.hea ../../ ;  cp Case106.segment.list ../../ ; cd - 
-python step5_segment_plot.py Case106.segment.list # it check all (on, off) in xxx.segment.list, and iteratively call function eca_plot1_eka_30sec_cli.py to plot png. 
+cp step5_segment_plot.py ../../ ; cp Case127.dat ../../ ; cp Case127.hea ../../ ;  cp Case127.segment.list ../../ ; cd - 
+python step5_segment_plot.py Case127.segment.list 3 # it check all (on, off) in xxx.segment.list, and iteratively call eca_plot1_eka_30sec_cli() to plot 3rd channel EKG segments in png.
 ```
