@@ -83,8 +83,6 @@ python step3_nn_hist_analysis.py #analysis nn interval using GMM.
 python step4_potential_arrhy.py > Case106.segment.list #identify potential arrhy segment.
 
 #ekg plot (potential arrhy segment)
-cp step5_segment_plot.py ../../
-cp Case106.dat ../../
-cd - 
-python step5_segment_plot.py # it check all (on, off) in Case106.segment.list, and iteratively call function eca_plot1_eka_30sec_cli.py to plot png. 
+cp step5_segment_plot.py ../../ ; cp Case106.dat ../../ ; cp Case106.hea ../../ ;  cp Case106.segment.list ../../ ; cd - 
+python step5_segment_plot.py Case106.segment.list # it check all (on, off) in xxx.segment.list, and iteratively call function eca_plot1_eka_30sec_cli.py to plot png. 
 ```
