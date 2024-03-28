@@ -38,22 +38,27 @@ class SignalProcessing:
         peak_threshold = np.mean(bandpass_filtered_ekg) * peak_threshold
 
         for peak in qrs_peaks:
+            # Determine the window around the QRS complex
             orig_start = max(0, int(peak - window_before * self.fs))
             orig_end = min(len(bandpass_filtered_ekg), int(peak + window_after * self.fs))
 
+            # Find the end of the QRS complex
             window_after_peak = bandpass_filtered_ekg[peak:orig_end]
             min_peaks, _ = find_peaks(-window_after_peak, distance=min_peak_distance, height=-peak_threshold)
             updated_end = min(int(peak + min_peaks[0] + window_after_ex * self.fs), orig_end) if len(min_peaks) > 0 else orig_end
 
+            # Find the start of the QRS complex
             window_before_peak = bandpass_filtered_ekg[orig_start:peak]
             min_peaks, _ = find_peaks(-window_before_peak, distance=min_peak_distance, height=-peak_threshold)
             updated_start = max(int(orig_start + min_peaks[-1] - window_before_ex * self.fs), orig_start) if len(min_peaks) > 0 else orig_start
 
+            # Combine the bandpass filtered and moving averaged signals within the QRS complex
             combined_ekg[updated_start:updated_end] = (
                 bandpass_filtered_ekg[updated_start:updated_end] * bpfilt_qrs_weight +
                 moving_averaged_ekg[updated_start:updated_end] * (1 - bpfilt_qrs_weight)
             )
 
+            # Fill the gaps before and after the QRS complex
             for gap_start, gap_end in [(orig_start, updated_start), (updated_end, orig_end)]:
                 if gap_start < gap_end:
                     gap_size = gap_end - gap_start
@@ -68,21 +73,24 @@ class SignalProcessing:
                         filtered_gap * (1 - mafilt_pt_weight)
                     )
 
+        # Apply final smoothing to the combined signal
         combined_ekg = np.convolve(combined_ekg, np.ones(smoothing_window) / smoothing_window, mode='same')
         return combined_ekg
 
 class EKGProcessor:
-    def __init__(self, fs=250):
+    def __init__(self, fs=250, baseline=170, window_size=20):
         self.fs = fs
+        self.baseline = baseline
+        self.window_size = window_size
         self.signal_processing = SignalProcessing(fs)
 
     def process_csv_ekg(self, input_file):
         ekg_data = pd.read_csv(input_file, header=None)
-        ekg_values = ekg_data.values[:, 1] + 170
+        ekg_values = ekg_data.values[:, 1] - np.mean(ekg_data.values[:, 1]) # + self.baseline
         timestamps = ekg_data.values[:, 0]
 
         bandpass_filtered_ekg = self.signal_processing.bandpass_filter(ekg_values, 0.5, 50, order=4)
-        moving_averaged_ekg = self.signal_processing.moving_average(bandpass_filtered_ekg, window_size=20)
+        moving_averaged_ekg = self.signal_processing.moving_average(bandpass_filtered_ekg, window_size=self.window_size)
 
         qrs_peaks = self.signal_processing.pan_tompkins_qrs_detect(bandpass_filtered_ekg)
         combined_ekg = self.signal_processing.combine_ekg(bandpass_filtered_ekg, moving_averaged_ekg, qrs_peaks)
@@ -108,26 +116,29 @@ class EKGProcessor:
 
 def main():
     parser = argparse.ArgumentParser(description='Plot EKG signal for a given record and time range.')
-    parser.add_argument('--format', type=str, choices=['wfdb', 'csv'], required=True, help='The format of the input data')
-    parser.add_argument('--record', type=str, help='The name of the record to plot (for WFDB format)')
+    parser.add_argument('--input', type=str, required=True, help='The input EKG data file (WFDB or CSV format)')
     parser.add_argument('--channel', type=int, default=0, help='The channel of the record to plot (for WFDB format)')
-    parser.add_argument('--start', type=int, help='The start time in seconds for the plot (for WFDB format)')
-    parser.add_argument('--end', type=int, help='The end time in seconds for the plot (for WFDB format)')
-    parser.add_argument('--input', type=str, help='The input EKG data file (for CSV format)')
+    parser.add_argument('--start', type=int, default=0, help='The start time in seconds for the plot')
+    parser.add_argument('--end', type=int, default=30, help='The end time in seconds for the plot')
     parser.add_argument('--output', type=str, help='The output file name for the plotted image')
+    parser.add_argument('--fs', type=int, default=250, help='The sampling frequency of the EKG signal')
+    parser.add_argument('--baseline', type=int, default=170, help='The baseline value to add to the EKG signal (for CSV format)')
+    parser.add_argument('--window_size', type=int, default=20, help='The window size for moving average filtering')
 
     args = parser.parse_args()
 
-    processor = EKGProcessor()
+    processor = EKGProcessor(fs=args.fs, baseline=args.baseline, window_size=args.window_size)
 
-    if args.format == 'wfdb':
-        ekg_signal, plot_timestamps, fs = processor.process_wfdb_ekg(args.record, args.channel, args.start, args.end)
-    elif args.format == 'csv':
+    if args.input.endswith('.dat'):
+        ekg_signal, plot_timestamps, fs = processor.process_wfdb_ekg(args.input, args.channel, args.start, args.end)
+    elif args.input.endswith('.csv'):
         ekg_signal, plot_timestamps = processor.process_csv_ekg(args.input)
-        fs = 250
+        fs = args.fs
+    else:
+        raise ValueError('Unsupported input file format. Please provide a WFDB (.dat) or CSV file.')
 
     ecg_plot.plot_single_channel_ekg_30sec(ekg_signal, sample_rate=fs)
-    output_file = args.output or f"{args.record}_{args.start}_{args.end}.png"
+    output_file = args.output or f"{args.input}_{args.start}_{args.end}"
     ecg_plot.save_as_png(output_file)
 
 if __name__ == '__main__':
